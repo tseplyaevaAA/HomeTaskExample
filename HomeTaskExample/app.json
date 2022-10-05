@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "HomeTaskExample",
+    "slug": "HomeTaskExample",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "HomeTaskExample"
+}
