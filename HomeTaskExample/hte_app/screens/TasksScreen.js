@@ -30,7 +30,7 @@ const TasksScreen = (props) => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        //console.log('Hello world TasksScreen')
+        console.log('Hello world TasksScreen')
         setLigthBtnText(taskType.taskType)
     }, [taskType]);
 
