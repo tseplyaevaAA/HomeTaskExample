@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     },
     separatorStyleTask: {
         height: '0.6%',
-        backgroundColor: SEPARATOR_COLOR
+        backgroundColor: SEPARATOR_COLOR 
     },
 
 });

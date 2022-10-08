@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { BUTTON_BACKGROUND_COLOR, WHITE_COLOR } from '../styles/color';
 
-const LightButton = (props) => {
+const CustomButton = (props) => {
     return (
         <TouchableOpacity
             style={styles.containerStyle}
@@ -16,18 +17,17 @@ const styles = StyleSheet.create({
     containerStyle: {
         height: '100%',
         width: '100%',
-        borderColor: '#3785CC',
+        backgroundColor: BUTTON_BACKGROUND_COLOR,
         borderRadius: 8,
-        borderWidth: 2,
         justifyContent: 'center',
         alignItems: 'center'
     },
     textStyle: {
         fontFamily: 'Roboto',
-        color: '#3785CC',
-        fontSize: 14
+        color: WHITE_COLOR,
+        fontSize: 16
     }
 
 });
 
-export default LightButton;
+export default CustomButton;
