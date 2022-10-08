@@ -38,7 +38,7 @@ const TasksScreen = (props) => {
     const [task, onChangeTask] = useState('');
 
     useEffect(() => {
-        //console.log('Hello world TasksScreen')
+        console.log('Hello world TasksScreen')
         setLigthBtnText(taskType.taskType)
     }, [taskType]);
 
