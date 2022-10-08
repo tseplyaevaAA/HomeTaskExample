@@ -7,4 +7,5 @@ export const TASK_FILTER_TYPE = {
 }
 
 export const TASK_TYPE_CHOSEN = 'TASK_TYPE_CHOSEN'
+export const TASK_KEY = 'TASK_KEY'
 
