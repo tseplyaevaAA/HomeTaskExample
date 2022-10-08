@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { LIGTH_BTN_COLOR } from '../styles/color';
 
 const LightButton = (props) => {
     return (
@@ -16,7 +17,7 @@ const styles = StyleSheet.create({
     containerStyle: {
         height: '100%',
         width: '100%',
-        borderColor: '#3785CC',
+        borderColor: LIGTH_BTN_COLOR,
         borderRadius: 8,
         borderWidth: 2,
         justifyContent: 'center',
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         fontFamily: 'Roboto',
-        color: '#3785CC',
+        color: LIGTH_BTN_COLOR,
         fontSize: 14
     }
 

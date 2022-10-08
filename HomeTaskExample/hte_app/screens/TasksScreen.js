@@ -4,17 +4,22 @@ import BackgroundView from '../components/BackgroundView';
 import LightButton from '../components/LightButton';
 import SeparatorView from '../components/SeparatorView';
 import TaskTypeView from '../components/TaskTypeView';
-import { ADD_BTN_TITLE, ADD_SUBJECT, CANCEL, SAVE, SPECIFY_TASK, TASK, TITLE } from '../utility/strings';
+import { ADD_BTN_TITLE, ADD_SUBJECT, CANCEL, EMPTY_TASK, NO_TASKS, NO_TASKS_ASSIGNED, SAVE, SPECIFY_TASK, TASK, TITLE } from '../utility/strings';
 import { TASK_FILTER_TYPE, TASK_KEY, TASK_TYPE_CHOSEN } from '../utility/constants';
 import { useSelector, useDispatch } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setTaskType } from '../../redux/actions';
-import { DIALOG_BACKGROUND_COLOR, MODAL_VIEW_BACKGROUND_COLOR, WHITE_COLOR } from '../styles/color';
+import { DIALOG_BACKGROUND_COLOR, MODAL_VIEW_BACKGROUND_COLOR, TASK_HEADER_COLOR, TASK_SUBHEADER_COLOR, TASK_SUBHEADER_COLOR_COMPL, TEXT_INPUT_BORDER, WHITE_COLOR } from '../styles/color';
 import CustomButton from '../components/CustomButton';
 import DialogButton from '../components/DialogButton';
 import { scale } from '../utility/utility';
 import { CHECKED_IMAGE, DELETE_IMAGE, UNCHECKED_IMAGE } from '../styles/images';
 import { TouchableOpacity } from 'react-native';
+import {
+    ToastAndroid,
+    Platform,
+    AlertIOS,
+} from 'react-native';
 
 let taskTypeData = [
     {
@@ -28,7 +33,6 @@ let taskTypeData = [
     }
 ]
 
-let exampleData = [{ title: 'Math', task: 'this is a math task', checked: true }, { title: 'Physics', task: 'This is a loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong physics task', checked: false }]
 let allTasks = []
 
 const TasksScreen = (props) => {
@@ -50,7 +54,7 @@ const TasksScreen = (props) => {
 
     useEffect(() => {
         getTasks()
-    } , [])
+    }, [])
 
     async function getTasks() {
         let tasks = await AsyncStorage.getItem(TASK_KEY)
@@ -59,15 +63,11 @@ const TasksScreen = (props) => {
             tasks.forEach(element => {
                 allTasks.push(element)
             });
-        } else {
-            exampleData.forEach(element => {
-                allTasks.push(element)
-            });
+            filterTasks()
         }
-        filterTasks()
     }
 
-    function filterTasks(){
+    function filterTasks() {
         let updatedList = []
         switch (taskType.taskType) {
             case TASK_FILTER_TYPE.ALL:
@@ -86,7 +86,7 @@ const TasksScreen = (props) => {
                 break;
         }
     }
- 
+
     function showTaskTypeDialog() {
         setModalDialogVisible(true)
     }
@@ -108,24 +108,33 @@ const TasksScreen = (props) => {
     }
 
     async function addNewTask() {
-        let newTask = { title: title, task: task, checked: false }
-        setModalAddTaskVisible(false)
-        allTasks.push(newTask)
+        if (!(title == '' && task == '')) {
+            let newTask = { title: title, task: task, checked: false }
+            setModalAddTaskVisible(false)
+            allTasks.push(newTask)
+            AsyncStorage.setItem(TASK_KEY, JSON.stringify(allTasks))
+            onChangeTask('')
+            onChangeTitle('')
+            filterTasks()
+        }
+        else {
+            if (Platform.OS === 'android') {
+                ToastAndroid.show(EMPTY_TASK, ToastAndroid.SHORT)
+            } else {
+                AlertIOS.alert(EMPTY_TASK);
+            }
+        }
+    }
+
+    function deleteTask(key) {
+        allTasks = allTasks.filter((item) => (item.title + item.task) != key)
         AsyncStorage.setItem(TASK_KEY, JSON.stringify(allTasks))
-        onChangeTask('')
-        onChangeTitle('')
         filterTasks()
     }
 
-    function deleteTask(key){
-        allTasks = allTasks.filter((item) => (item.title+item.task) != key)
-        AsyncStorage.setItem(TASK_KEY, JSON.stringify(allTasks))
-        filterTasks()
-    }
-
-    function changeStatusTask(key){
-        allTasks.forEach((item)=>{
-            if ((item.title+item.task) == key){
+    function changeStatusTask(key) {
+        allTasks.forEach((item) => {
+            if ((item.title + item.task) == key) {
                 item.checked = !item.checked
             }
         })
@@ -143,12 +152,14 @@ const TasksScreen = (props) => {
                     </Image>
                 </TouchableOpacity>
                 <View style={styles.textContainer}>
-                    <Text style={styles.taskHeaderStyle}
-                        numberOfLines={1}>{item.title}
-                    </Text>
-                    <Text numberOfLines={10}
-                        style={item.checked ? styles.taskSubheaderCompletedStyle : styles.taskSubheaderStyle}>{item.task}
-                    </Text>
+                    {item.title !== '' &&
+                        <Text style={styles.taskHeaderStyle}
+                            numberOfLines={1}>{item.title}
+                        </Text>}
+                    {item.task !== '' &&
+                        <Text numberOfLines={10}
+                            style={item.checked ? styles.taskSubheaderCompletedStyle : styles.taskSubheaderStyle}>{item.task}
+                        </Text>}
                 </View>
                 <TouchableOpacity
                     onPress={() => { deleteTask(item.title + item.task) }}>
@@ -163,33 +174,34 @@ const TasksScreen = (props) => {
 
     return (
         <>
-            {modalDialogVisible && <Modal
-                animationType="fade"
-                transparent={true}
-                visible={true}
-            >
-                <View style={styles.modalViewStyle}>
-                    <View style={styles.taskTypeContainer}>
-                        <TaskTypeView
-                            text={taskTypeData[0].type}
-                            isHighlighted={taskTypeData[0].type == taskType.taskType}
-                            action={() => { setNewTaskType(0) }}>
-                        </TaskTypeView>
-                        <SeparatorView taskType={true} />
-                        <TaskTypeView
-                            text={taskTypeData[1].type}
-                            isHighlighted={taskTypeData[1].type == taskType.taskType}
-                            action={() => { setNewTaskType(1) }}>
-                        </TaskTypeView>
-                        <SeparatorView taskType={true} />
-                        <TaskTypeView
-                            text={taskTypeData[2].type}
-                            isHighlighted={taskTypeData[2].type == taskType.taskType}
-                            action={() => { setNewTaskType(2) }}>
-                        </TaskTypeView>
+            {modalDialogVisible &&
+                <Modal
+                    animationType="fade"
+                    transparent={true}
+                    visible={true}
+                >
+                    <View style={styles.modalViewStyle}>
+                        <View style={styles.taskTypeContainer}>
+                            <TaskTypeView
+                                text={taskTypeData[0].type}
+                                isHighlighted={taskTypeData[0].type == taskType.taskType}
+                                action={() => { setNewTaskType(0) }}>
+                            </TaskTypeView>
+                            <SeparatorView taskType={true} />
+                            <TaskTypeView
+                                text={taskTypeData[1].type}
+                                isHighlighted={taskTypeData[1].type == taskType.taskType}
+                                action={() => { setNewTaskType(1) }}>
+                            </TaskTypeView>
+                            <SeparatorView taskType={true} />
+                            <TaskTypeView
+                                text={taskTypeData[2].type}
+                                isHighlighted={taskTypeData[2].type == taskType.taskType}
+                                action={() => { setNewTaskType(2) }}>
+                            </TaskTypeView>
+                        </View>
                     </View>
-                </View>
-            </Modal>}
+                </Modal>}
             {modalAddTaskVisible &&
                 <Modal
                     animationType="fade"
@@ -237,11 +249,20 @@ const TasksScreen = (props) => {
                 </View>
                 <SeparatorView />
                 <View style={styles.contentContainer}>
-                    <FlatList
-                        style={styles.tasksContainerStyle}
-                        data={tasks}
-                        renderItem={renderItem}
-                        keyExtractor={item => item.title + item.task}></FlatList>
+                    {tasks.length != 0 &&
+                        <FlatList
+                            style={styles.tasksContainerStyle}
+                            data={tasks}
+                            renderItem={renderItem}
+                            keyExtractor={item => item.title + item.task}>
+                        </FlatList>}
+                    {tasks.length == 0 &&
+                        <View style={styles.emptyViewStyle}>
+                            <Text
+                                style={styles.taskHeaderStyle}>
+                                {(allTasks.length == 0) ? NO_TASKS_ASSIGNED : NO_TASKS}
+                            </Text>
+                        </View>}
                 </View>
                 <View style={styles.bottomView}>
                     <View style={styles.buttonContainer}>
@@ -259,7 +280,7 @@ const TasksScreen = (props) => {
 const styles = StyleSheet.create({
 
     tasksOptionsContainer: {
-        height: scale(40), //'14%',
+        height: scale(40),
         justifyContent: 'center',
         marginTop: '6%',
         alignItems: 'center',
@@ -276,25 +297,23 @@ const styles = StyleSheet.create({
     },
     modalViewStyle: {
         flex: 1,
-        //height: '22%',
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: MODAL_VIEW_BACKGROUND_COLOR,
     },
     addTaskContainer: {
-        height: scale(90),//'34%',
-        width: scale(100),//'80%',
+        height: scale(90),
+        width: scale(100),
         backgroundColor: DIALOG_BACKGROUND_COLOR,
         borderRadius: 14,
         flexDirection: 'column',
         alignItems: 'center',
     },
     contentContainer: {
-        //flex: 0.85,
-        height: scale(205)
+        height: scale(205),
+        justifyContent: 'center'
     },
     bottomView: {
-        //flex: 0.15,
         height: scale(30),
         justifyContent: 'center',
         alignItems: 'center',
@@ -312,7 +331,7 @@ const styles = StyleSheet.create({
     },
     textHeaderStyle: {
         fontFamily: 'Roboto',
-        color: '#3B3B3B',
+        color: TASK_HEADER_COLOR,
         fontSize: 17,
         marginTop: '5%',
         alignSelf: 'center',
@@ -320,7 +339,7 @@ const styles = StyleSheet.create({
     },
     textSubheaderStyle: {
         fontFamily: 'Roboto',
-        color: '#737A82',
+        color: TASK_SUBHEADER_COLOR,
         fontSize: 13,
         alignSelf: 'center',
         marginBottom: '3%'
@@ -331,17 +350,16 @@ const styles = StyleSheet.create({
         marginTop: '3%',
         backgroundColor: WHITE_COLOR,
         borderRadius: 7,
-        borderColor: '#737A8230',
+        borderColor: TEXT_INPUT_BORDER,
         borderWidth: 1,
         paddingHorizontal: '3%',
     },
     taskItemStyle: {
-        height: 'auto',//scale(30),
+        height: 'auto',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: scale(5)
-        //justifyContent:'space-between'
     },
     tasksContainerStyle: {
         paddingHorizontal: '5%',
@@ -352,30 +370,31 @@ const styles = StyleSheet.create({
         width: scale(20),
     },
     textContainer: {
-        height: 'auto',//scale(20),
+        height: 'auto',
         width: scale(88),
         flexDirection: 'column',
         paddingHorizontal: scale(2)
     },
     taskHeaderStyle: {
         fontFamily: 'Roboto',
-        color: '#3B3B3B',
+        color: TASK_HEADER_COLOR,
         fontSize: 17,
-        //alignSelf: 'center',
-        marginBottom: scale(2),
         fontWeight: '400'
     },
     taskSubheaderStyle: {
         fontFamily: 'Roboto',
-        color: '#3B3B3B',
+        color: TASK_HEADER_COLOR,
         fontSize: 13,
     },
     taskSubheaderCompletedStyle: {
         fontFamily: 'Roboto',
-        color: '#6F767E',
+        color: TASK_SUBHEADER_COLOR_COMPL,
         fontSize: 13,
         textDecorationLine: 'line-through',
         textDecorationStyle: 'solid',
+    },
+    emptyViewStyle: {
+        alignItems: 'center',
     }
 
 });
