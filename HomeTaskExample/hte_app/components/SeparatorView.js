@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { SEPARATOR_COLOR } from '../styles/color';
+import { scale } from '../utility/utility';
 
 const SeparatorView = (props) => {
     return (
@@ -12,11 +13,11 @@ const SeparatorView = (props) => {
 const styles = StyleSheet.create({
 
     separatorStyle: {
-        height: '0.2%',
+        height: scale(0.5),
         backgroundColor: SEPARATOR_COLOR
     },
     separatorStyleTask: {
-        height: '0.6%',
+        height: scale(0.5),
         backgroundColor: SEPARATOR_COLOR 
     },
 
