@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { WHITE_COLOR } from '../styles/color';
+import { DIALOG_BTN_TEXT, DIALOG_BTN_TEXT_HIGH, WHITE_COLOR } from '../styles/color';
 
 const DialogButton = (props) => {
     return (
@@ -30,12 +30,12 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         fontFamily: 'Roboto',
-        color: '#C3C3C5',
+        color: DIALOG_BTN_TEXT,
         fontSize: 17
     },
     textHighlightedStyle: {
         fontFamily: 'Roboto',
-        color: '#3784CC',
+        color: DIALOG_BTN_TEXT_HIGH,
         fontSize: 17,
     }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, Text } from 'react-native';
-import { WHITE_COLOR } from '../styles/color';
+import { BUTTON_BACKGROUND_COLOR, TASK_TYPE_TEXT_COLOR } from '../styles/color';
 
 const TaskTypeView = (props) => {
     return (
@@ -22,12 +22,12 @@ const styles = StyleSheet.create({
     },
     textStyle: {
         fontFamily: 'Roboto',
-        color: '#737A82',
+        color: TASK_TYPE_TEXT_COLOR,
         fontSize: 16
     },
     textStyleHiglighted: {
         fontFamily: 'Roboto',
-        color: '#3785CC',
+        color: BUTTON_BACKGROUND_COLOR,
         fontSize: 16
     }
 
